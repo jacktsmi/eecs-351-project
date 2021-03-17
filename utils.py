@@ -10,7 +10,7 @@ def rename_data(dir_path):
         data or test data)
     """
     index = 1
-    for path in pathlib.Path(dit_path).iterdir():
+    for path in pathlib.Path(dir_path).iterdir():
         if path.is_file():
             directory = path.parent
             old_extension = path.suffix
