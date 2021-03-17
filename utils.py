@@ -9,6 +9,8 @@ def rename_data(dir_path, start_ind=1):
         dir_path : Path to the directory which has the files we wish to rename
         (For our purposes this will likely be the folder with either the train
         data or test data)
+
+        start_ind : index to start the naming with before iterating
     """
     index = start_ind
     for path in pathlib.Path(dir_path).iterdir():
