@@ -1,6 +1,7 @@
 import pathlib
+import os
 
-def rename_data(dir_path):
+def rename_data(dir_path, start_ind=1):
     """
     Renames all files in dir_path to "trainX" where X is a number.
 
@@ -9,7 +10,7 @@ def rename_data(dir_path):
         (For our purposes this will likely be the folder with either the train
         data or test data)
     """
-    index = 1
+    index = start_ind
     for path in pathlib.Path(dir_path).iterdir():
         if path.is_file():
             directory = path.parent
