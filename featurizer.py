@@ -6,14 +6,11 @@ def calc_spectral_centroid(song, fs, frame_size=1000):
     """
     Will calculate spectral centroid value of a song. Should be called
     in featurize().
-
     Inputs:
         song : N, numpy array representing audio signal. Be sure to
         extract just one channel before passing into function. See
         featurizer_tests.py for example.
-
         fs : sampling frequency of the song
-
         frame_size : width of the frame, in samples, of where we wish to
         calculate the spectral centroid.
     
@@ -24,9 +21,9 @@ def calc_spectral_centroid(song, fs, frame_size=1000):
     spectral_centroid = np.zeros((int(song.shape[0] / frame_size)))
     ind = 0
     for i in range(spectral_centroid.shape[0]):
-        frame_fft = np.fft.fft(song[ind:ind+frame_size]) # Taking just first channel. Negligible difference between fft of 1 and fft of 2.
+        frame_fft = np.fft.fft(song[ind:ind+frame_size])
         fft_mag = abs(frame_fft)
-        k = np.arange(0, fft_mag.shape[0])
+        k = np.arange(0, frame_size)
         spectral_centroid[i] = np.sum(k * fft_mag) / np.sum(fft_mag)
         ind = ind+frame_size
 
