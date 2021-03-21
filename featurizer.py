@@ -20,11 +20,13 @@ def calc_spectral_centroid(song, fs, frame_size=1000):
     """
     spectral_centroid = np.zeros((int(song.shape[0] / frame_size)))
     ind = 0
+    print('cya')
     for i in range(spectral_centroid.shape[0]):
-        frame_fft = np.fft.fft(song[ind:ind+frame_size])
-        fft_mag = abs(frame_fft)
-        k = np.arange(0, frame_size)
-        spectral_centroid[i] = np.sum(k * fft_mag) / np.sum(fft_mag)
+        x = song[ind:ind+frame_size]
+        magnitudes = np.abs(np.fft.rfft(x)) # magnitudes of positive frequencies
+        length = len(x)
+        freqs = np.abs(np.fft.fftfreq(length, 1.0/fs)[:length//2+1]) # positive frequencies
+        spectral_centroid[i] = np.sum(magnitudes*freqs) / np.sum(magnitudes) # return weighted mean
         ind = ind+frame_size
 
     return spectral_centroid
