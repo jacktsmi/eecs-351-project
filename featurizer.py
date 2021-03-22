@@ -20,7 +20,6 @@ def calc_spectral_centroid(song, fs, frame_size=1000):
     """
     spectral_centroid = np.zeros((int(song.shape[0] / frame_size)))
     ind = 0
-    print('cya')
     for i in range(spectral_centroid.shape[0]):
         x = song[ind:ind+frame_size]
         magnitudes = np.abs(np.fft.rfft(x)) # magnitudes of positive frequencies
