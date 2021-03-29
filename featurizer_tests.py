@@ -21,12 +21,27 @@ sc2 = ft.calc_spectral_centroid(data2, fs2)
 #plt.plot(sc2, 'r')
 #plt.show()
 
+fs3, data3 = wavfile.read('./train/train500.wav') # Calm Song
+data3 = data3[:, 0] # Take only one channel
+data3 = np.array(data3)
+data3 = ut.middle_n(data3, 2000000)
+sb1 = ft.calc_spectral_bandwidth(data3, fs3,sc1)
+
+#plt.plot(sb1, 'b')
+#plt.show()
+
+song,sr = librosa.load('./train/train500.wav')
+sc_train1 = librosa.feature.spectral_bandwidth(song, sr = sr,n_fft = 1000,p=2)[0]
+plt.plot(sc_train1)
+plt.show()
+
+
 # MFCC
 mfcc = ft.calc_mfcc(data1, fs1)
 mfcc = np.array(mfcc)
-plt.pcolormesh(mfcc.T)
-plt.show()
+#plt.pcolormesh(mfcc.T)
+#plt.show()
 mfcc2 = ft.calc_mfcc(data2, fs2)
 mfcc2 = np.array(mfcc2)
-plt.pcolormesh(mfcc2.T)
-plt.show()
+#plt.pcolormesh(mfcc2.T)
+#plt.show()

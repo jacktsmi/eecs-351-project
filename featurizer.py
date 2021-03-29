@@ -31,11 +31,34 @@ def calc_spectral_centroid(song, fs, frame_size=1000):
 
     return spectral_centroid
 
-def calc_spectral_bandwidth(song):
+def calc_spectral_bandwidth(song,fs,sc,frame_size=1000):
     """
     Will calculate spectral bandwidth of a song. Should be called
-    in featurize().
+    in featurize(). 
+    Inputs:
+        song : N, numpy array representing audio signal. Be sure to
+        extract just one channel before passing into function. See
+        featurizer_tests.py for example
+        fs : sampling frequency of the song
+        frame_size : width of the frame, in samples, of where we wish to
+        calculate the spectral bandwidth.
+
+        Outputs:
+        spectral_bandwidth : N/frame_size length vector representing the spectral centroid
+        value for each frame of the song.
     """
+    spectral_bandwidth = np.zeros_like(sc)
+    ind = 0
+
+    for i in range(spectral_bandwidth.shape[0]):
+        x = song[ind:ind+frame_size]
+        magnitudes = np.abs(np.fft.rfft(x)) # magnitudes of positive frequencies
+        length = len(x)
+        freqs = np.abs(np.fft.fftfreq(length, 1.0/fs)[:length//2+1]) # positive frequencies
+        spectral_bandwidth[i] = np.sum((magnitudes**2)*((freqs-sc[i])**2)) / np.sum(magnitudes**2) # return weighted mean
+        ind = ind+frame_size
+
+    return spectral_bandwidth
 
 def calc_mfcc(song, fs, frame_size=1000):
     """
