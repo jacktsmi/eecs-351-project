@@ -55,7 +55,7 @@ def calc_spectral_bandwidth(song,fs,sc,frame_size=1000):
         magnitudes = np.abs(np.fft.rfft(x)) # magnitudes of positive frequencies
         length = len(x)
         freqs = np.abs(np.fft.fftfreq(length, 1.0/fs)[:length//2+1]) # positive frequencies
-        spectral_bandwidth[i] = np.sum((magnitudes**2)*((freqs-sc[i])**2)) / np.sum(magnitudes**2) # return weighted mean
+        spectral_bandwidth[i] = (np.sum(magnitudes*(freqs-sc[i])**2))**(1/2) # return weighted mean
         ind = ind+frame_size
 
     return spectral_bandwidth
