@@ -122,7 +122,7 @@ def calc_chroma(song):
     in featurize().
     """
 
-def featurize(song):
+def featurize(song, fs, frame_size=1000):
     """
     Will featurize an audio signal into Spectral Centroid, Spectral Bandwidth,
     MFCC, and Chroma.
@@ -133,3 +133,4 @@ def featurize(song):
     Outputs:
         feat_song : length 4 vector representing featurized audio
     """
+    return song_feat
