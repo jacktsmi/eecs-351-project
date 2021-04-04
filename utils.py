@@ -35,13 +35,20 @@ def middle_n(vector, n):
     mid_index = math.floor(vector.shape[0] / 2)
     return vector[mid_index - int(n / 2):mid_index + int(n / 2)]
 
-def save_train(out_path, train_path, fs, frame_size=1000):
+def save_train(out_path, train_path, frame_size=1000):
     """
     Will featurize every training file and save the numpy arrays in a text
     file.
 
     Inputs:
         out_path : string of path where files should be saved.
+
+        train_path : string of path name where training files are
+
+        frame_size : size of frame to be used in feature calculation
+    
+    Outputs:
+        None
     """
     for path in pathlib.Path(train_path).iterdir():
         fs, song = wavfile.read(train_path + '/' + path)
@@ -51,6 +58,17 @@ def save_train(out_path, train_path, fs, frame_size=1000):
         np.save(out_path + path, song_feat)
 
 def load_train(load_path):
+    """
+    Loads in training data as saved by the save_train function and stores
+    the data in a 2d numpy array.
+
+    Inputs:
+        load_path : string of path where we load in the data
+    
+    Outputs:
+        train_data : num_train_samps x input_dim numpy array containing featurized
+        training data
+    """
     num_samps = 729
     input_dim = 8000
     train_data = np.zeros((num_samps, input_dim))
