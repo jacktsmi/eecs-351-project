@@ -11,6 +11,7 @@ fs1, data1 = wavfile.read('./train/train500.wav') # Calm Song
 data1 = data1[:, 0] # Take only one channel
 data1 = np.array(data1)
 data1 = ut.middle_n(data1, 2000000)
+"""
 sc1 = ft.calc_spectral_centroid(data1, fs1)
 fs2, data2 = wavfile.read('./train/train700.wav') # Hype Song
 data2 = data2[:, 0] # Take only one channel
@@ -23,6 +24,25 @@ plt.title('Spectral Centroid')
 plt.legend()
 plt.show()
 
+"""
+# Checking chroma features
+fs, data1 = wavfile.read('./train/train500.wav')
+data1 = data1[:, 0]
+data1 = np.array(data1)
+data1 = ut.middle_n(data1, 2000000)
+freqs, magn = ft.calc_chroma(data1, fs)
+
+# Plot Spectrogram
+spec = plt.figure(figsize=(10, 4))
+plt.imshow(10 * np.log10(magn), origin='lower', aspect='auto', cmap='gray_r',
+           extent=[T_coef[0], T_coef[-1], F_coef[0], F_coef[-1]])
+plt.clim([-30, 30])
+plt.ylim([0, freqs[999]])
+plt.xlabel('Time (seconds)')
+plt.ylabel('Frequency (Hz)')
+cbar = plt.colorbar()
+cbar.set_label('Magnitude (dB)')
+"""
 # Plotting Spectral Bandwidth
 sb1 = ft.calc_spectral_bandwidth(data1, fs1, sc1)
 sb2 = ft.calc_spectral_bandwidth(data2, fs2, sc2)
@@ -44,3 +64,4 @@ mfcc2 = np.array(mfcc2)
 plt.pcolormesh(mfcc2.T)
 plt.title('Hype Song MFCC')
 plt.show()
+"""

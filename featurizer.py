@@ -116,11 +116,49 @@ def calc_mfcc(song, fs, frame_size=1000):
     return mfcc
     
 
-def calc_chroma(song):
+def calc_chroma(song, fs, frame_size=1000):
     """
     Will calculate chroma of a song. Should be called
     in featurize().
+
+    Inputs:
+        song: length N vector representing audio signal
+        fs: sampling frequency
+        frame_rate = 1000 (by default)
+
+    Outputs:
+
+    Procedure:
+    1. Compute the linear spectrogram of the audio signal
+        a. 1000 frames (window on each frame) -> perform FFT on each one = STFT
+        b. Resulting coefficient from FFT gives us the magnitude
+        c. x-axis is in time (one magnitude per (audio sample length)/1000 s)
+        d. y-axis has one magnitude associated with each frequency (length of FFT) for each frame
+    2. Change axis scale to log frequency (Hz to p-values)
+    3. Add up corresponding chroma labels {C, C#, ..., B} within the frequency range to compute chromagram
     """
+
+    magnitudes = np.zeros((int(song.shape[0] / frame_size)))
+    ind = 0
+    for i in range(magnitudes.shape[0]):
+        x = song[ind:ind + frame_size]
+        magnitudes[i] = np.abs(np.fft.rfft(x))  # magnitudes of positive frequencies
+        length = len(x)
+        freqs = np.abs(np.fft.fftfreq(length, 1.0 / fs)[:length // 2 + 1])  # positive frequencies
+        ind = ind + frame_size
+
+    """
+    hann_win = scipy.signal.hamming(256, sym=True)
+    for i in range(N_frames):
+        frame_Spectrum[:, i] = np.fft.rfft(hann_win * signal[start:start + frame_size], fft_Size)
+        scale = 1.0 / ((hann_win).sum() ** 2)
+        scale = np.sqrt(scale)
+        frame_Spectrum *= scale
+        frame_Spectrogram[:, i] = abs(frame_Spectrum[:, i])**2
+        step += 128
+    """
+    return freqs, magnitudes
+
 
 def featurize(song):
     """
