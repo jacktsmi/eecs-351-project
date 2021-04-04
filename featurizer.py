@@ -64,6 +64,18 @@ def calc_mfcc(song, fs, frame_size=1000):
     """
     Will calculate MFCC's of a song. Should be called
     in featurize().
+
+    Inputs:
+        song : N, numpy array representing audio signal. Be sure to
+        extract just one channel before passing into function. See
+        featurizer_tests.py for example
+
+        fs : sampling frequency as output by wavfile.read
+
+        frame_size : size of window for mfcc calculation
+    
+    Outputs:
+        mfcc : N/frame_size x 12 numpy array of mfcc values
     """
     mfcc = np.zeros((int(song.shape[0] / frame_size)))
     pre_emphasis = 0.97
@@ -160,7 +172,7 @@ def calc_chroma(song, fs, frame_size=1000):
     return freqs, magnitudes
 
 
-def featurize(song):
+def featurize(song, fs, frame_size=1000):
     """
     Will featurize an audio signal into Spectral Centroid, Spectral Bandwidth,
     MFCC, and Chroma.
