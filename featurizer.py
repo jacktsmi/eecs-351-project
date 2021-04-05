@@ -75,7 +75,7 @@ def calc_mfcc(song, fs, frame_size=1000):
         frame_size : size of window for mfcc calculation
     
     Outputs:
-        mfcc : N/frame_size x 12 numpy array of mfcc values
+        mfcc : (N/frame_size*2 - 2, 12) numpy array of mfcc values
     """
     mfcc = np.zeros((int(song.shape[0] / frame_size)))
     pre_emphasis = 0.97
