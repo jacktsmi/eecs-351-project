@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.io import wavfile
 import utils as ut
 import librosa
+import librosa.display
 
 # Plots to see if spectral centroid appears to be the weighted average frequency.
 # To run, select and right-click and select "Run Selection/Line in Interactive Window"
@@ -26,14 +27,14 @@ plt.show()
 
 """
 # Checking chroma features
-fs, data1 = wavfile.read('./train/train500.wav')
+"""fs, data1 = wavfile.read('./train/train500.wav')
 data1 = data1[:, 0]
 data1 = np.array(data1)
 data1 = ut.middle_n(data1, 2000000)
-freqs, magn = ft.calc_chroma(data1, fs)
+freqs, magn = ft.calc_chroma(data1, fs)"""
 
 # Plot Spectrogram
-spec = plt.figure(figsize=(10, 4))
+"""spec = plt.figure(figsize=(10, 4))
 plt.imshow(10 * np.log10(magn), origin='lower', aspect='auto', cmap='gray_r',
            extent=[T_coef[0], T_coef[-1], F_coef[0], F_coef[-1]])
 plt.clim([-30, 30])
@@ -41,7 +42,19 @@ plt.ylim([0, freqs[999]])
 plt.xlabel('Time (seconds)')
 plt.ylabel('Frequency (Hz)')
 cbar = plt.colorbar()
-cbar.set_label('Magnitude (dB)')
+cbar.set_label('Magnitude (dB)')"""
+
+y, sr = librosa.load('./train/train500.wav')
+
+S = np.abs(librosa.stft(y))
+chroma = librosa.feature.chroma_stft(S = S,sr = sr)
+
+plt.figure(figsize=(10, 4))
+librosa.display.specshow(chroma, y_axis='chroma', x_axis='time')
+plt.colorbar()
+plt.title('Chromagram')
+plt.tight_layout()
+
 """
 # Plotting Spectral Bandwidth
 sb1 = ft.calc_spectral_bandwidth(data1, fs1, sc1)
