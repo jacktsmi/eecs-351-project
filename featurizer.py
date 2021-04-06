@@ -159,6 +159,8 @@ def calc_chroma(song, fs, frame_size=1000):
         freqs = np.abs(np.fft.fftfreq(length, 1.0 / fs)[:length // 2 + 1])  # positive frequencies
         ind = ind + frame_size
 
+
+
     """
     hann_win = scipy.signal.hamming(256, sym=True)
     for i in range(N_frames):

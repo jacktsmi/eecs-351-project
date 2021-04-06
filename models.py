@@ -8,7 +8,8 @@ class Net(nn.Module):
         input_dim = 8000 # Unsure
         hidden_dim = 1000
         num_moods = 4
-        self.main = nn.Sequential(
+        self.main = nn.Sequential
+        (
             nn.Linear(input_dim, hidden_dim ,bias=True),
             nn.ReLU(),
             nn.Linear(hidden_dim, num_moods, bias=True),
