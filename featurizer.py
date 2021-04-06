@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 from scipy.io import wavfile
 import sys
 from scipy.fftpack import dct
@@ -158,9 +159,13 @@ def calc_chroma(song, fs, frame_size=1000):
         length = len(x)
         freqs = np.abs(np.fft.fftfreq(length, 1.0 / fs)[:length // 2 + 1])  # positive frequencies
         ind = ind + frame_size
+    Y = np.abs(magnitudes)**2
 
-
-
+    f, t, STFT = scipy.signal.stft(song, fs)
+    
+    # f = Array of sample frequencies
+    # t = Array of segment times.
+    # STFT = STFT of song (complex, plot magnitude)
     """
     hann_win = scipy.signal.hamming(256, sym=True)
     for i in range(N_frames):
@@ -185,3 +190,13 @@ def featurize(song, fs, frame_size=1000):
     Outputs:
         feat_song : length 4 vector representing featurized audio
     """
+
+    sc = ft.calc_spectral_centroid(song, fs)
+    sb = ft.calc_spectral_bandwidth(song, fs, sc)
+    mfcc = ft.calc_mfcc(song, fs)
+    mfcc.reshape(mfcc.shape[0]*mfcc.shape[1])
+    
+
+    features = [sc,sb,mfcc]
+
+    return features
