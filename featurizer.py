@@ -159,6 +159,14 @@ def calc_chroma(song, fs, frame_size=1000):
         freqs = np.abs(np.fft.fftfreq(length, 1.0 / fs)[:length // 2 + 1])  # positive frequencies
         ind = ind + frame_size
 
+    Y = np.abs(magnitudes)**2
+
+    f, t, STFT = scipy.signal.stft(song, fs)
+    
+    # f = Array of sample frequencies
+    # t = Array of segment times.
+    # STFT = STFT of song (complex, plot magnitude)
+    
     """
     hann_win = scipy.signal.hamming(256, sym=True)
     for i in range(N_frames):
