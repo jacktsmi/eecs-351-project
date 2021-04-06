@@ -191,3 +191,13 @@ def featurize(song, fs, frame_size=1000):
     Outputs:
         feat_song : length 4 vector representing featurized audio
     """
+
+    sc = ft.calc_spectral_centroid(song, fs)
+    sb = ft.calc_spectral_bandwidth(song, fs, sc)
+    mfcc = ft.calc_mfcc(song, fs)
+    mfcc.reshape(mfcc.shape[0]*mfcc.shape[1])
+    
+
+    features = [sc,sb,mfcc]
+
+    return features
