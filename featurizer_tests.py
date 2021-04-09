@@ -11,7 +11,7 @@ import librosa.display
 fs1, data1 = wavfile.read('./train/train500.wav') # Calm Song
 data1 = data1[:, 0] # Take only one channel
 data1 = np.array(data1)
-data1 = ut.middle_n(data1, 2000000)
+data1 = ut.middle_n(data1, 20000)
 """
 sc1 = ft.calc_spectral_centroid(data1, fs1)
 fs2, data2 = wavfile.read('./train/train700.wav') # Hype Song
@@ -27,11 +27,16 @@ plt.show()
 
 """
 # Checking chroma features
-"""fs, data1 = wavfile.read('./train/train500.wav')
-data1 = data1[:, 0]
-data1 = np.array(data1)
-data1 = ut.middle_n(data1, 2000000)
-freqs, magn = ft.calc_chroma(data1, fs)"""
+coeff, coeff_freq = ft.calc_chroma(data1, fs1)
+spec = plt.figure(figsize=(10,4))
+plt.imshow(10*np.log10(coeff))
+plt.clim([-30, 30])
+plt.xlim([1, 20])
+plt.ylim([0, coeff_freq[19][999]])
+plt.xlabel('Time (seconds)')
+plt.ylabel('Frequency (Hz)')
+cbar = plt.colorbar()
+cbar.set_label('Magnitude (dB)')
 
 # Plot Spectrogram
 """spec = plt.figure(figsize=(10, 4))
@@ -42,7 +47,7 @@ plt.ylim([0, freqs[999]])
 plt.xlabel('Time (seconds)')
 plt.ylabel('Frequency (Hz)')
 cbar = plt.colorbar()
-cbar.set_label('Magnitude (dB)')"""
+cbar.set_label('Magnitude (dB)')
 
 y, sr = librosa.load('./train/train500.wav')
 
@@ -57,6 +62,7 @@ plt.tight_layout()
 
 """
 # Plotting Spectral Bandwidth
+"""
 sb1 = ft.calc_spectral_bandwidth(data1, fs1, sc1)
 sb2 = ft.calc_spectral_bandwidth(data2, fs2, sc2)
 

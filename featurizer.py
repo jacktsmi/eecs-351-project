@@ -137,7 +137,7 @@ def calc_chroma(song, fs, frame_size=1000):
     Inputs:
         song: length N vector representing audio signal
         fs: sampling frequency
-        frame_rate = 1000 (by default)
+        frame_size = 1000 (by default)
 
     Outputs:
 
@@ -150,7 +150,7 @@ def calc_chroma(song, fs, frame_size=1000):
     2. Change axis scale to log frequency (Hz to p-values)
     3. Add up corresponding chroma labels {C, C#, ..., B} within the frequency range to compute chromagram
     """
-
+    """
     magnitudes = np.zeros((int(song.shape[0] / frame_size)))
     ind = 0
     for i in range(magnitudes.shape[0]):
@@ -160,23 +160,59 @@ def calc_chroma(song, fs, frame_size=1000):
         freqs = np.abs(np.fft.fftfreq(length, 1.0 / fs)[:length // 2 + 1])  # positive frequencies
         ind = ind + frame_size
     Y = np.abs(magnitudes)**2
+    """
+    # w = scipy.hamming(frame) - Ignore hamming window for now
 
-    f, t, STFT = scipy.signal.stft(song, fs)
+    # C[0] returns an array of magnitudes whose indices are frequencies at frame 0
+    # C[i][j] - i represents frame number, j represents frequency, value is magnitude
+
+    songLen = song.shape[0] # 2000000 samples
+    num_frames = songLen//frame_size
+    ind = 0
+    C = np.zeros((num_frames, frame_size))
+    C_freq = np.zeros((num_frames, frame_size))
+    for i in range(0, num_frames):
+        curr_mag = scipy.fft(song[ind: ind + frame_size])
+        curr_mag_freqs = scipy.fft.fftfreq(song[ind: ind + frame_size])
+        # print(curr_mag_freqs)
+        for j in range(0, curr_mag.shape[0]):
+            C[i][j] = np.abs(curr_mag[j])**2
+            C_freq[i][j] = curr_mag_freqs[j]
+        ind += frame_size
+
+    # Lowest is C1, highest is G9 all with respect to A4 = 440 Hz (p = 69)
+    """
+     Procedure:
+        1.  
+    """
+    lower = np.zeros(128)
+    upper = np.zeros(128)
+    for p in range(0, 127):
+        lower[p] = 2 ** ((p - 0.5 - 69) / 12) * 440
+        upper[p] = 2 ** ((p + 0.5 - 69) / 12) * 440
+
+    mag_pitch = np.zeros((num_frames, 128))
+    for i in range(0, num_frames):
+        for j in range(0, frame_size):
+            for p in range(0, 127):
+                if (C_freq[i][j] >= lower[p] and C_freq[i][j] < upper[p]):
+                    mag_pitch[i][p] += C[i][j]
+                    break
+
+    mag_chroma = np.zeros((num_frames, 12))
+    # p = 0 corresponds to C, p = 127 corresponds to G
+    for p in range(0, 127):
+        mag_chroma[(p - 60) % 12] = mag_pitch[p]
+
+    return mag_chroma
+
+    # chroma = np.fmod(np.round(np.log2(X / 440) * 12), 12)
+
+    # f, t, STFT = scipy.signal.stft(song, fs)
     
     # f = Array of sample frequencies
     # t = Array of segment times.
     # STFT = STFT of song (complex, plot magnitude)
-    """
-    hann_win = scipy.signal.hamming(256, sym=True)
-    for i in range(N_frames):
-        frame_Spectrum[:, i] = np.fft.rfft(hann_win * signal[start:start + frame_size], fft_Size)
-        scale = 1.0 / ((hann_win).sum() ** 2)
-        scale = np.sqrt(scale)
-        frame_Spectrum *= scale
-        frame_Spectrogram[:, i] = abs(frame_Spectrum[:, i])**2
-        step += 128
-    """
-    return freqs, magnitudes
 
 
 def featurize(song, fs, frame_size=1000):
