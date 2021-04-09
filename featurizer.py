@@ -200,8 +200,7 @@ def calc_chroma(song, fs, frame_size=1000):
                     break
 
     mag_chroma = np.zeros((num_frames, 12))
-    # p = 0 correspond
-    # s to C, p = 127 corresponds to G
+
     for p in range(0, 127):
         mag_chroma[(p - 60) % 12] = mag_pitch[p]
 
