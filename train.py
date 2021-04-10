@@ -14,6 +14,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 from torchsummary import summary
+import matplotlib.pyplot as plt
 
 sc_train = []
 sb_train = []
@@ -111,7 +112,7 @@ chroma_test = MyDataset(chroma_test, test_targets)
 
 batch_size = 10
 
-num_epochs = 100
+num_epochs = 50
 
 save_dir = "weights"
 
@@ -141,117 +142,180 @@ loss_traj_sb = []
 loss_traj_mfcc = []
 loss_traj_chroma = []
 
+sc_acc = []
+sb_acc = []
+mfcc_acc = []
+chroma_acc = []
+
+test_acc = []
+train_acc = []
+
 criterion = nn.CrossEntropyLoss()
 
 for epoch in range(num_epochs):
     print("Epoch #" + str(epoch+1) + "/" + str(num_epochs))
     
-    for phase in ['train', 'test']:
-        if phase == 'train':
-            sc_net.train()
-            sb_net.train()
-            mfcc_net.train()
-            chroma_net.train()
-        else:
-            sc_net.eval()
-            sb_net.eval()
-            mfcc_net.eval()
-            chroma_net.eval()
+    sc_net.train()
+    sb_net.train()
+    mfcc_net.train()
+    chroma_net.train()
 
-        running_sc_loss = 0.0
-        running_sc_corrects = 0
+    running_sc_loss = 0.0
+    running_sc_loss_test = 0.0
+    running_sc_corrects = 0
+    running_sc_corrects_test = 0
 
-        running_sb_loss = 0.0
-        running_sb_corrects = 0
+    running_sb_loss = 0.0
+    running_sb_loss_test = 0.0
+    running_sb_corrects = 0
+    running_sb_corrects_test = 0
 
-        running_mfcc_loss = 0.0
-        running_mfcc_corrects = 0
+    running_mfcc_loss = 0.0
+    running_mfcc_loss_test = 0.0
+    running_mfcc_corrects = 0
+    running_mfcc_corrects_test = 0
 
-        running_chroma_loss = 0.0
-        running_chroma_corrects = 0
+    running_chroma_loss = 0.0
+    running_chroma_loss_test = 0.0
+    running_chroma_corrects = 0
+    running_chroma_corrects_test = 0
 
-        for i, ((in_sc, label_sc), (in_sb, label_sb), (in_mfcc, label_mfcc), (in_chroma, label_chroma)) in enumerate(train_loader):
-            if phase == 'train':
-                
-                # SC
-                sc_net.zero_grad()
-                out_sc = sc_net(in_sc.float())
-                out_sc_max, sc_preds = torch.max(out_sc, dim=1)
-                loss_sc = criterion(out_sc, label_sc)
-                loss_sc.backward()
-                optim_sc.step()
+    for i, ((in_sc, label_sc), (in_sb, label_sb), (in_mfcc, label_mfcc), (in_chroma, label_chroma)) in enumerate(train_loader):            
+        # SC
+        sc_net.zero_grad()
+        out_sc = sc_net(in_sc.float())
+        out_sc_max, sc_preds = torch.max(out_sc, dim=1)
+        loss_sc = criterion(out_sc, label_sc)
+        loss_sc.backward()
+        optim_sc.step()
 
-                # SB
-                sb_net.zero_grad()
-                out_sb = sb_net(in_sb.float())
-                out_sb_max, sb_preds = torch.max(out_sb, dim=1)
-                loss_sb = criterion(out_sb, label_sb)
-                loss_sb.backward()
-                optim_sb.step()
+        # SB
+        sb_net.zero_grad()
+        out_sb = sb_net(in_sb.float())
+        out_sb_max, sb_preds = torch.max(out_sb, dim=1)
+        loss_sb = criterion(out_sb, label_sb)
+        loss_sb.backward()
+        optim_sb.step()
 
-                # MFCC
-                mfcc_net.zero_grad()
-                out_mfcc = mfcc_net(in_mfcc.float())
-                out_mfcc_max, mfcc_preds = torch.max(out_mfcc, dim=1)
-                loss_mfcc = criterion(out_mfcc, label_mfcc)
-                loss_mfcc.backward()
-                optim_mfcc.step()
+        # MFCC
+        mfcc_net.zero_grad()
+        out_mfcc = mfcc_net(in_mfcc.float())
+        out_mfcc_max, mfcc_preds = torch.max(out_mfcc, dim=1)
+        loss_mfcc = criterion(out_mfcc, label_mfcc)
+        loss_mfcc.backward()
+        optim_mfcc.step()
 
-                # CHROMA
-                chroma_net.zero_grad()
-                out_chroma = chroma_net(in_chroma.float())
-                out_chroma_max, chroma_preds = torch.max(out_chroma, dim=1)
-                loss_chroma = criterion(out_chroma, label_chroma)
-                loss_chroma.backward()
-                optim_chroma.step()
-            else:
-                # SC
-                sc_net.zero_grad()
-                out_sc = sc_net(in_sc.float())
-                out_sc_max, sc_preds = torch.max(out_sc, dim=1)
-                loss_sc = criterion(out_sc, label_sc)
+        # CHROMA
+        chroma_net.zero_grad()
+        out_chroma = chroma_net(in_chroma.float())
+        out_chroma_max, chroma_preds = torch.max(out_chroma, dim=1)
+        loss_chroma = criterion(out_chroma, label_chroma)
+        loss_chroma.backward()
+        optim_chroma.step()
 
-                # SB
-                sb_net.zero_grad()
-                out_sb = sb_net(in_sb.float())
-                out_sb_max, sb_preds = torch.max(out_sb, dim=1)
-                loss_sb = criterion(out_sb, label_sb)
+        running_sc_loss += loss_sc.item() * in_sc.size(0)
+        running_sc_corrects += torch.sum(sc_preds == label_sc)
 
-                # MFCC
-                mfcc_net.zero_grad()
-                out_mfcc = mfcc_net(in_mfcc.float())
-                out_mfcc_max, mfcc_preds = torch.max(out_mfcc, dim=1)
-                loss_mfcc = criterion(out_mfcc, label_mfcc)
+        running_sb_loss += loss_sb.item() * in_sb.size(0)
+        running_sb_corrects += torch.sum(sb_preds == label_sb)
 
-                # CHROMA
-                chroma_net.zero_grad()
-                out_chroma = chroma_net(in_chroma.float())
-                out_chroma_max, chroma_preds = torch.max(out_chroma, dim=1)
-                loss_chroma = criterion(out_chroma, label_chroma)
-            
-            running_sc_loss += loss_sc.item() * in_sc.size(0)
-            running_sc_corrects += torch.sum(sc_preds == label_sc)
+        running_mfcc_loss += loss_mfcc.item() * in_mfcc.size(0)
+        running_mfcc_corrects += torch.sum(mfcc_preds == label_mfcc)
 
-            running_sb_loss += loss_sb.item() * in_sb.size(0)
-            running_sb_corrects += torch.sum(sb_preds == label_sb)
+        running_chroma_loss += loss_chroma.item() * in_chroma.size(0)
+        running_chroma_corrects += torch.sum(chroma_preds == label_chroma)
 
-            running_mfcc_loss += loss_mfcc.item() * in_mfcc.size(0)
-            running_mfcc_corrects += torch.sum(mfcc_preds == label_mfcc)
+    for i, ((in_sc, label_sc), (in_sb, label_sb), (in_mfcc, label_mfcc), (in_chroma, label_chroma)) in enumerate(test_loader):  
+        # SC
+        sc_net.zero_grad()
+        out_sc = sc_net(in_sc.float())
+        out_sc_max, sc_preds = torch.max(out_sc, dim=1)
+        loss_sc = criterion(out_sc, label_sc)
 
-            running_chroma_loss += loss_chroma.item() * in_chroma.size(0)
-            running_chroma_corrects += torch.sum(chroma_preds == label_chroma)
-        
-        if phase == 'train':
-            num_samples = 729-40
-        else:
-            num_batches = 40
-        
-        epoch_total_loss = (running_sc_loss+running_sb_loss+running_mfcc_loss+running_chroma_loss) / num_samples
-        avg_epoch_acc = (running_chroma_corrects.double()+running_mfcc_corrects.double()+running_sb_corrects.double()+running_sc_corrects.double()) / num_samples / 4
+        # SB
+        sb_net.zero_grad()
+        out_sb = sb_net(in_sb.float())
+        out_sb_max, sb_preds = torch.max(out_sb, dim=1)
+        loss_sb = criterion(out_sb, label_sb)
 
-        print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_total_loss, avg_epoch_acc))
+        # MFCC
+        mfcc_net.zero_grad()
+        out_mfcc = mfcc_net(in_mfcc.float())
+        out_mfcc_max, mfcc_preds = torch.max(out_mfcc, dim=1)
+        loss_mfcc = criterion(out_mfcc, label_mfcc)
 
-torch.save(sc_net.state_dict(), "sc_net_model.pt")
-torch.save(sb_net.state_dict(), "sb_net_model.pt")
-torch.save(mfcc_net.state_dict(), "mfcc_net_model.pt")
-torch.save(chroma_net.state_dict(), "chroma_net_model.pt")
+        # CHROMA
+        chroma_net.zero_grad()
+        out_chroma = chroma_net(in_chroma.float())
+        out_chroma_max, chroma_preds = torch.max(out_chroma, dim=1)
+        loss_chroma = criterion(out_chroma, label_chroma)
+
+        running_sc_loss_test += loss_sc.item() * in_sc.size(0)
+        running_sc_corrects_test += torch.sum(sc_preds == label_sc)
+
+        running_sb_loss_test += loss_sb.item() * in_sb.size(0)
+        running_sb_corrects_test += torch.sum(sb_preds == label_sb)
+
+        running_mfcc_loss_test += loss_mfcc.item() * in_mfcc.size(0)
+        running_mfcc_corrects_test += torch.sum(mfcc_preds == label_mfcc)
+
+        running_chroma_loss_test += loss_chroma.item() * in_chroma.size(0)
+        running_chroma_corrects_test += torch.sum(chroma_preds == label_chroma)
+    
+    num_samples_train =  729-40
+    num_samples_test =  40
+
+    epoch_train_loss = (running_sc_loss+running_sb_loss+running_mfcc_loss+running_chroma_loss) / num_samples_train
+    epoch_test_loss = (running_sc_loss_test+running_sb_loss_test+running_mfcc_loss_test+running_chroma_loss_test) / num_samples_test
+    train_epoch_acc = (running_chroma_corrects.double()+running_mfcc_corrects.double()+running_sb_corrects.double()+running_sc_corrects.double()) / num_samples_train / 4
+    test_epoch_acc = (running_chroma_corrects_test+running_mfcc_corrects_test+running_sb_corrects_test+running_sc_corrects_test) / num_samples_test / 4
+
+    train_acc.append(train_epoch_acc.item())
+    test_acc.append(test_epoch_acc.item())
+
+    sc_test_acc = running_sc_corrects_test.double() / num_samples_test
+    sb_test_acc = running_sb_corrects_test.double() / num_samples_test
+    mfcc_test_acc = running_mfcc_corrects_test.double() / num_samples_test
+    chroma_test_acc = running_chroma_corrects_test.double() / num_samples_test
+
+    sc_acc.append(sc_test_acc.item())
+    sb_acc.append(sb_test_acc.item())
+    mfcc_acc.append(mfcc_test_acc.item())
+    chroma_acc.append(chroma_test_acc.item())
+
+    print('{} Loss: {:.4f} Acc: {:.4f}'.format('train', epoch_train_loss, train_epoch_acc))
+    print('{} Loss: {:.4f} Acc: {:.4f}'.format('test', epoch_test_loss, test_epoch_acc))
+
+loss_traj_sc.append(running_sc_loss_test)
+loss_traj_sb.append(running_sb_loss_test)
+loss_traj_mfcc.append(running_mfcc_loss_test)
+loss_traj_chroma.append(running_chroma_loss_test)
+
+torch.save(sc_net.state_dict(), "sc_net_model2.pt")
+torch.save(sb_net.state_dict(), "sb_net_model2.pt")
+torch.save(mfcc_net.state_dict(), "mfcc_net_model2.pt")
+torch.save(chroma_net.state_dict(), "chroma_net_model2.pt")
+
+fig, axes = plt.subplots()
+axes.plot(loss_traj_sc, 'b', label="Spectral Centroid Loss")
+axes.set_title("Spectral Centroid Network Loss vs Epoch")
+
+axes.plot(loss_traj_sb, 'r', label="Spectral Bandwidth Loss")
+axes.set_title("Spectral Bandwidth Network Loss vs Epoch")
+
+axes.plot(loss_traj_mfcc, 'g', label="MFCC Loss")
+axes.set_title("MFCC Network Loss vs Epoch")
+
+axes.plot(loss_traj_chroma, 'p', label="Chroma Loss")
+axes.set_title("Chroma Network Loss vs Epoch")
+
+fig.savefig("Loss_plots.png")
+plt.show()
+
+fig2, ax2 = plt.subplots()
+ax2.plot(test_acc, 'b', label='Test Accuracy')
+ax2.plot(train_acc, 'r', label='Train Accuracy')
+ax2.legend()
+
+fig2.savefig("Accuracies.png")
+plt.show()

@@ -2,20 +2,21 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        input_dim = 8000 # Unsure
-        hidden_dim = 1000
+class MyNet(nn.Module):
+    def __init__(self, input_dim):
+        super(MyNet, self).__init__()
         num_moods = 4
-        self.main = nn.Sequential
-        (
-            nn.Linear(input_dim, hidden_dim ,bias=True),
+        self.main = nn.Sequential(
+            nn.Linear(input_dim, 1000, bias=True),
             nn.ReLU(),
-            nn.Linear(hidden_dim, num_moods, bias=True),
-            nn.Softmax()
+            nn.Linear(1000, num_moods, bias=True)
         )
     
     def forward(self, x):
         out = self.main(x)
         return out
+
+def weights_init(layer):
+    if type(layer) == nn.Linear:
+        nn.init.normal_(layer.weight.data, 0.0, 0.01)
+        nn.init.constant_(layer.bias.data, 0.0)
