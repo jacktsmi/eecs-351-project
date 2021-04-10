@@ -2,6 +2,7 @@ import numpy as np
 import scipy
 from scipy.io import wavfile
 import sys
+import math
 from scipy.fftpack import dct
 
 def calc_spectral_centroid(song, fs, frame_size=1000):
@@ -174,8 +175,8 @@ def calc_chroma(song, fs, frame_size=1000):
     C_freq = np.zeros((num_frames, frame_size)) # Magnitudes of each frequency at each time step
     # Loops through all the frames to compute Fourier coefficients and frequencies
     for i in range(0, num_frames):
-        curr_mag = scipy.fft(song[ind: ind + frame_size])
-        curr_mag_freqs = scipy.fft.fftfreq(song[ind: ind + frame_size])
+        curr_mag = np.fft.rfft(song[ind: ind + frame_size])
+        curr_mag_freqs = np.fft.rfftfreq(frame_size, d=1/fs)
         for j in range(0, curr_mag.shape[0]):
             C[i][j] = np.abs(curr_mag[j])**2
             C_freq[i][j] = curr_mag_freqs[j]
@@ -204,7 +205,7 @@ def calc_chroma(song, fs, frame_size=1000):
     mag_chroma = np.zeros((num_frames, 12))
     for i in range(0, num_frames):
         for p in range(0, 127):
-            mag_chroma[i][(p - 60) % 12] = mag_pitch[i][p]
+            mag_chroma[i][(p - 60) % 12] += mag_pitch[i][p]
 
     # First index is time-step, second-index is chroma label starting at C and ending at B
     # Value of array is magnitude of that point on chromagram
