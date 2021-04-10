@@ -140,6 +140,7 @@ def calc_chroma(song, fs, frame_size=1000):
         frame_size = 1000 (by default)
 
     Outputs:
+        mag_chroma: Output 2d vector that computes chromagram
 
     Procedure:
     1. Compute the linear spectrogram of the audio signal

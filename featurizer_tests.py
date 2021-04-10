@@ -27,7 +27,9 @@ plt.show()
 
 """
 # Checking chroma features
-coeff, coeff_freq = ft.calc_chroma(data1, fs1)
+chromas = ft.calc_chroma(data1, fs1)
+print(chromas)
+"""
 spec = plt.figure(figsize=(10,4))
 plt.imshow(10*np.log10(coeff))
 plt.clim([-30, 30])
@@ -37,7 +39,7 @@ plt.xlabel('Time (seconds)')
 plt.ylabel('Frequency (Hz)')
 cbar = plt.colorbar()
 cbar.set_label('Magnitude (dB)')
-
+"""
 # Plot Spectrogram
 """spec = plt.figure(figsize=(10, 4))
 plt.imshow(10 * np.log10(magn), origin='lower', aspect='auto', cmap='gray_r',
