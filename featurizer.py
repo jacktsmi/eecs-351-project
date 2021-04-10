@@ -167,42 +167,46 @@ def calc_chroma(song, fs, frame_size=1000):
     # C[i][j] - i represents frame number, j represents frequency, value is magnitude
 
     songLen = song.shape[0] # 2000000 samples
-    num_frames = songLen//frame_size
-    ind = 0
-    C = np.zeros((num_frames, frame_size))
-    C_freq = np.zeros((num_frames, frame_size))
+    num_frames = songLen//frame_size # x-axis on Chromagram
+    ind = 0 # Essentially hopping parameter
+    C = np.zeros((num_frames, frame_size)) # Magnitudes of Fourier coefficients (see above)
+    C_freq = np.zeros((num_frames, frame_size)) # Magnitudes of each frequency at each time step
+    # Loops through all the frames to compute Fourier coefficients and frequencies
     for i in range(0, num_frames):
         curr_mag = scipy.fft(song[ind: ind + frame_size])
         curr_mag_freqs = scipy.fft.fftfreq(song[ind: ind + frame_size])
-        # print(curr_mag_freqs)
         for j in range(0, curr_mag.shape[0]):
             C[i][j] = np.abs(curr_mag[j])**2
             C_freq[i][j] = curr_mag_freqs[j]
         ind += frame_size
 
     # Lowest is C1, highest is G9 all with respect to A4 = 440 Hz (p = 69)
-    """
-     Procedure:
-        1.  
-    """
+
     lower = np.zeros(128)
     upper = np.zeros(128)
+    # Finds upper and lower bounds for each MIDI pitch
     for p in range(0, 127):
         lower[p] = 2 ** ((p - 0.5 - 69) / 12) * 440
         upper[p] = 2 ** ((p + 0.5 - 69) / 12) * 440
 
+    # Loops through all the frames, time steps, fits magnitude under the pitch within
+    # which it fits
     mag_pitch = np.zeros((num_frames, 128))
     for i in range(0, num_frames):
         for j in range(0, frame_size):
             for p in range(0, 127):
-                if (C_freq[i][j] >= lower[p] and C_freq[i][j] < upper[p]):
+                if lower[p] <= C_freq[i][j] < upper[p]:
                     mag_pitch[i][p] += C[i][j]
                     break
 
+    # Matches the chroma labels to the MIDI pitches
     mag_chroma = np.zeros((num_frames, 12))
-    for p in range(0, 127):
-        mag_chroma[(p - 60) % 12] = mag_pitch[p]
+    for i in range(0, num_frames):
+        for p in range(0, 127):
+            mag_chroma[i][(p - 60) % 12] = mag_pitch[i][p]
 
+    # First index is time-step, second-index is chroma label starting at C and ending at B
+    # Value of array is magnitude of that point on chromagram
     return mag_chroma
 
     # chroma = np.fmod(np.round(np.log2(X / 440) * 12), 12)
