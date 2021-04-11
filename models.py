@@ -7,9 +7,27 @@ class MyNet(nn.Module):
         super(MyNet, self).__init__()
         num_moods = 4
         self.main = nn.Sequential(
-            nn.Linear(input_dim, 1000, bias=True),
+            nn.Linear(input_dim, 500, bias=True),
             nn.ReLU(),
-            nn.Linear(1000, num_moods, bias=True)
+            nn.Linear(500, 200, bias=True),
+            nn.ReLU(),
+            nn.Linear(200, 50, bias=True),
+            nn.ReLU(),
+            nn.Linear(50, num_moods, bias=True)
+        )
+    
+    def forward(self, x):
+        out = self.main(x)
+        return out
+
+class ConvNet(nn.Module):
+    def __init__(self, input_dim):
+        super(ConvNet, self).__init__()
+        num_moods = 4
+        self.main = nn.Sequential(
+            nn.Conv1d(input_dim, 100, 10),
+            nn.ReLU(),
+            nn.Linear(100, num_moods, bias=True)
         )
     
     def forward(self, x):
