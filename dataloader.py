@@ -1,34 +1,30 @@
 import numpy as np
 import os
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from PIL import Image
+import torch
 
-class Data(Dataset):
-    def __init__(self, root_dir):
-        self.files = []
+class MyDataset(Dataset):
+    def __init__(self, data, targets, transform=None):
+        self.data = torch.tensor(data)
+        self.targets = torch.LongTensor(targets)
+        self.transform = transform
 
-        for filename in os.listdir(root_dir):
-            base, _ = os.path.splitext(filename)
-            try:
-                filenum = int(base)
-            except ValueError:
-                continue
-            
-            if 0 <= filenum < 1600:
-                self.files.append(root_dir + '/' + filename)
-                # end if
-            # end for files in root_dir
-        # end if train split
-    # end __init__()
-
-    # len overload, returns the number of files in the loader
-    def __len__(self):
-        return len(self.files)
-    # end __len__()
-
-    # bracket [] overload
     def __getitem__(self, index):
-        feat_vec = np.load(self.files[index])
-        feat_vec = np.asarray(feat_vec)
-        return feat_vec
-    # end __getitem__()
+        x = self.data[index]
+        y = self.targets[index]
+
+        return x, y
+
+    def __len__(self):
+        return len(self.data)
+
+class ConcatDataset(Dataset):
+    def __init__(self, *datasets):
+        self.datasets = datasets
+    
+    def __getitem__(self, i):
+        return tuple(d[i] for d in self.datasets)
+    
+    def __len__(self):
+        return min(len(d) for d in self.datasets)
