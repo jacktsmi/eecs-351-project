@@ -47,7 +47,7 @@ for ind in range(1, 730):
         test.append(data)
         label = 3 # Hype
         test_targets.append(label)
-    elif 12 <= ind <= 220:
+    elif 12 <= ind <= 169:
         train.append(data)
         label = 0 # Happy
         train_targets.append(label)
@@ -55,11 +55,11 @@ for ind in range(1, 730):
         train.append(data)
         label = 1 # Sad
         train_targets.append(label)
-    elif 391 <= ind <= 548:
+    elif 391 <= ind <= 391+147:
         train.append(data)
         label = 2 # Calm
         train_targets.append(label)
-    elif 560 <= ind <= 729:
+    elif 560 <= ind <= 560+147:
         train.append(data)
         label = 3 # Hype
         train_targets.append(label)
@@ -150,7 +150,7 @@ for epoch in range(num_epochs):
             plt.savefig(f'conf_mats/conf_mat_epoch{epoch}.png')
             plt.show()
     
-    num_samples_train =  729-44
+    num_samples_train =  148*4-44
     num_samples_test =  44
 
     # Total loss from all NN's

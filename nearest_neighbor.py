@@ -1,22 +1,6 @@
 import numpy as np
-from scipy.io import wavfile
 from scipy import stats
-import sys
-from scipy.fftpack import dct
-import torch
-import featurizer as ft
-import utils as ut
-from models import MyNet, weights_init
-from dataloader import MyDataset, ConcatDataset
-from torchvision import datasets, models, transforms
-import torch.nn as nn
-import torch.optim as optim
-from torch.autograd import Variable
-import torch.nn.functional as F
-from torch.utils.data import DataLoader, Dataset
-from torchsummary import summary
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
 
 train_sc = np.zeros((250, 685))
 train_sb = np.zeros((250, 685))
@@ -140,7 +124,7 @@ for k in range(1, 30):
     num_correct = np.sum(np.array(pred_labels) == np.array(test_targets))
     accuracies.append(num_correct*100/len(test_targets))
 
-plt.plot(range(1,30),accuracies)
+plt.plot(range(1, 30), accuracies)
 plt.xlabel('k')
 plt.ylabel('Accuracies (%)')
 plt.savefig('k_neighbors.png')
