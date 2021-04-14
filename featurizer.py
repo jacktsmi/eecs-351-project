@@ -21,6 +21,7 @@ def calc_spectral_centroid(song, fs, frame_size=1000):
         spectral_centroid : N/frame_size length vector representing the spectral centroid
         value for each frame of the song.
     """
+    # Weighted Average of Frequencies by their Magnitudes for each frame (center of the signal)
     spectral_centroid = np.zeros((int(song.shape[0] / frame_size)))
     ind = 0
     for i in range(spectral_centroid.shape[0]):
@@ -30,7 +31,6 @@ def calc_spectral_centroid(song, fs, frame_size=1000):
         freqs = np.abs(np.fft.fftfreq(length, 1.0/fs)[:length//2+1]) # positive frequencies
         spectral_centroid[i] = np.sum(magnitudes*freqs) / np.sum(magnitudes) # return weighted mean
         ind = ind+frame_size
-
     return spectral_centroid
 
 def calc_spectral_bandwidth(song,fs,sc,frame_size=1000):
@@ -52,6 +52,7 @@ def calc_spectral_bandwidth(song,fs,sc,frame_size=1000):
     spectral_bandwidth = np.zeros_like(sc)
     ind = 0
 
+    # Standard Deviation of the Signal (Power of the TF around the center frequency)
     for i in range(spectral_bandwidth.shape[0]):
         x = song[ind:ind+frame_size]
         magnitudes = np.abs(np.fft.rfft(x)) # magnitudes of positive frequencies
@@ -206,6 +207,8 @@ def calc_chroma(song, fs, frame_size=1000):
     for i in range(0, num_frames):
         for p in range(0, 127):
             mag_chroma[i][(p - 60) % 12] += mag_pitch[i][p]
+        for p in range(0, 12):
+            mag_chroma[i][p] = 10*np.log10(mag_chroma[i][p])
 
     # First index is time-step, second-index is chroma label starting at C and ending at B
     # Value of array is magnitude of that point on chromagram
