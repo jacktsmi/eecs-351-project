@@ -125,5 +125,5 @@ ax4[1][1].set_yticklabels('C C# D D# E F F# G G# A A# B'.split())
 
 fig4.suptitle('Chromagram', fontsize=32)
 cbar = fig4.colorbar(im_chroma, ax=ax4)
-cbar.set_label('Magnitude (dB)')
+cbar.set_label('Magnitude (dB)', fontsize=20)
 plt.savefig('Chromagram_Moods')
