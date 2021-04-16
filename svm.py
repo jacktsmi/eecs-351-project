@@ -109,6 +109,60 @@ sb_preds = clf_sb.predict(test_sb.T)
 mfcc_preds = clf_mfcc.predict(test_mfcc.T)
 chroma_preds = clf_chroma.predict(test_chroma.T)
 
+c = confusion_matrix(np.array(test_targets), np.array(sc_preds), labels=[0, 1, 2, 3])
+plt.imshow(c, interpolation='nearest')
+tick_marks = np.arange(4)
+plt.xticks(tick_marks, ["happy", "sad", "calm", "hype"], rotation=45)
+plt.yticks(tick_marks, ["happy", "sad", "calm", "hype"])
+plt.title('Confusion Matrix for Spectral Centroid')
+plt.savefig('svm_conf_sc.png')
+plt.show()
+
+corrects_sc = np.sum(np.array(sc_preds) == np.array(test_targets))
+accuracy_sc = corrects_sc/len(test_targets)
+print("Spectral Centroid Accuracy: " + str(accuracy_sc))
+
+
+c = confusion_matrix(np.array(test_targets), np.array(sb_preds), labels=[0, 1, 2, 3])
+plt.imshow(c, interpolation='nearest')
+tick_marks = np.arange(4)
+plt.xticks(tick_marks, ["happy", "sad", "calm", "hype"], rotation=45)
+plt.yticks(tick_marks, ["happy", "sad", "calm", "hype"])
+plt.title('Confusion Matrix for Spectral Bandwidth')
+plt.savefig('svm_conf_sb.png')
+plt.show()
+
+corrects_sb = np.sum(np.array(sb_preds) == np.array(test_targets))
+accuracy_sb = corrects_sb/len(test_targets)
+print("Spectral Bandwidth Accuracy: " + str(accuracy_sc))
+
+
+c = confusion_matrix(np.array(test_targets), np.array(mfcc_preds), labels=[0, 1, 2, 3])
+plt.imshow(c, interpolation='nearest')
+tick_marks = np.arange(4)
+plt.xticks(tick_marks, ["happy", "sad", "calm", "hype"], rotation=45)
+plt.yticks(tick_marks, ["happy", "sad", "calm", "hype"])
+plt.title('Confusion Matrix for MFCC')
+plt.savefig('svm_conf_mfcc.png')
+plt.show()
+
+corrects_mfcc = np.sum(np.array(mfcc_preds) == np.array(test_targets))
+accuracy_mfcc = corrects_mfcc/len(test_targets)
+print("MFCC Accuracy: " + str(accuracy_sc))
+
+c = confusion_matrix(np.array(test_targets), np.array(chroma_preds), labels=[0, 1, 2, 3])
+plt.imshow(c, interpolation='nearest')
+tick_marks = np.arange(4)
+plt.xticks(tick_marks, ["happy", "sad", "calm", "hype"], rotation=45)
+plt.yticks(tick_marks, ["happy", "sad", "calm", "hype"])
+plt.title('Confusion Matrix for Spectral Chroma')
+plt.savefig('svm_conf_chroma.png')
+plt.show()
+
+corrects_chroma = np.sum(np.array(chroma_preds) == np.array(test_targets))
+accuracy_chroma = corrects_chroma/len(test_targets)
+print("Spectral Chroma Accuracy: " + str(accuracy_chroma))
+
 total_pred = np.stack((sc_preds, sb_preds, mfcc_preds, chroma_preds), axis=-1)
 preds = stats.mode(total_pred, axis=1)[0]
 corrects = np.sum(np.array(preds.squeeze()) == np.array(test_targets))
@@ -123,6 +177,6 @@ plt.savefig('svm_conf.png')
 plt.show()
 
 accuracy = corrects/len(test_targets)
-print(accuracy)
+print("Total Accuracy: " + str(accuracy))
 
 
