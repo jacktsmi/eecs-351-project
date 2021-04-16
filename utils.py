@@ -4,6 +4,8 @@ import math
 import numpy as np
 from scipy.io import wavfile
 import featurizer as ft
+from scipy import stats
+from sklearn import svm
 
 def rename_data(dir_path, start_ind=1):
     """
@@ -76,3 +78,158 @@ def load_train(load_path):
     for path in pathlib.Path(load_path).iterdir():
         train_data[index, :] = np.load(path)
     return train_data
+
+def k_nn(path):
+    fs, data1 = wavfile.read(path)
+    if data1.ndim > 1:
+        data1 = data1[:, 0]
+    data = middle_n(data1, 1000000)
+    sc = ft.calc_spectral_centroid(data, fs)
+    sb = ft.calc_spectral_bandwidth(data, fs, sc)
+    mfcc = ft.calc_mfcc(data, fs)
+    data2 = middle_n(data1, 25000)
+    chroma = ft.calc_chroma(data2, fs)
+
+    train_sc = np.zeros((250, 160*4))
+    train_sb = np.zeros((250, 160*4))
+    train_mfcc = np.zeros((5976, 160*4))
+    train_chroma = np.zeros((25*12, 160*4))
+
+    train_targets = []
+
+    accuracies = []
+
+    train_i = 0
+
+    for ind in range(1, 730):
+        i = str(ind)
+        sc = np.load("train_spectral_centroid/" + i + ".npy")
+        sb = np.load("train_spectral_bandwidth/" + i + ".npy")
+        mfcc = np.load("train_mfcc/" + i + ".npy")
+        chroma = np.load("train_chroma/" + i + ".npy")
+
+        if 0 <= ind <= 12+147:
+            train_sc[:,train_i] = sc
+            train_sb[:,train_i] = sb
+            train_mfcc[:,train_i] = mfcc
+            train_chroma[:,train_i] = chroma
+            train_i += 1
+            label = 0 # Happy
+            train_targets.append(label)
+        elif 220 <= ind <= 232+147:
+            train_sc[:,train_i] = sc
+            train_sb[:,train_i] = sb
+            train_mfcc[:,train_i] = mfcc
+            train_chroma[:,train_i] = chroma
+            train_i += 1
+            label = 1 # Sad
+            train_targets.append(label)
+        elif 380 <= ind <= 392+147:
+            train_sc[:,train_i] = sc
+            train_sb[:,train_i] = sb
+            train_mfcc[:,train_i] = mfcc
+            train_chroma[:,train_i] = chroma
+            train_i += 1
+            label = 2 # Calm
+            train_targets.append(label)
+        elif 549 <= ind <= 561+147:
+            train_sc[:,train_i] = sc
+            train_sb[:,train_i] = sb
+            train_mfcc[:,train_i] = mfcc
+            train_chroma[:,train_i] = chroma
+            train_i += 1
+            label = 3 # Hype
+            train_targets.append(label)
+
+    k = 40
+
+    sc_diff = train_sc - np.tile(sc, (160*4,1)).T
+    sb_diff = train_sb - np.tile(sb, (160*4,1)).T
+    mfcc_diff = train_mfcc - np.tile(mfcc, (160*4,1)).T
+    chroma_diff = train_chroma - np.tile(chroma, (160*4,1)).T
+
+    sc_norm = np.linalg.norm(sc_diff,axis = 0)
+    sb_norm = np.linalg.norm(sb_diff,axis = 0)
+    mfcc_norm = np.linalg.norm(mfcc_diff,axis = 0)
+    chroma_norm = np.linalg.norm(chroma_diff,axis = 0)
+
+    sc_ind = np.argsort(sc_norm)[:k]
+    sb_ind = np.argsort(sb_norm)[:k]
+    mfcc_ind = np.argsort(mfcc_norm)[:k]
+    chroma_ind = np.argsort(chroma_norm)[:k]
+
+    sc_labels = np.array([train_targets[i] for i in sc_ind])
+    sb_labels = np.array([train_targets[i] for i in sb_ind])
+    mfcc_labels = np.array([train_targets[i] for i in mfcc_ind])
+    chroma_labels = np.array([train_targets[i] for i in chroma_ind])
+
+    out = stats.mode(np.concatenate((sc_labels, sb_labels, mfcc_labels, chroma_labels)))[0][0]
+
+    return out
+
+def calc_svm(path):
+    train_sc = np.zeros((250, 639))
+    train_sb = np.zeros((250, 639))
+    train_mfcc = np.zeros((5976, 639))
+    train_chroma = np.zeros((25*12, 639))
+
+    train_targets = []
+
+    train_i = 0
+
+    for ind in range(1, 730):
+        i = str(ind)
+        sc = np.load("train_spectral_centroid/" + i + ".npy")
+        sb = np.load("train_spectral_bandwidth/" + i + ".npy")
+        mfcc = np.load("train_mfcc/" + i + ".npy")
+        chroma = np.load("train_chroma/" + i + ".npy")
+
+        if 0 <= ind <= 12+147:
+            train_sc[:,train_i] = sc
+            train_sb[:,train_i] = sb
+            train_mfcc[:,train_i] = mfcc
+            train_chroma[:,train_i] = chroma
+            train_i += 1
+            label = 0 # Happy
+            train_targets.append(label)
+        elif 220 <= ind <= 232+147:
+            train_sc[:,train_i] = sc
+            train_sb[:,train_i] = sb
+            train_mfcc[:,train_i] = mfcc
+            train_chroma[:,train_i] = chroma
+            train_i += 1
+            label = 1 # Sad
+            train_targets.append(label)
+        elif 380 <= ind <= 392+147:
+            train_sc[:,train_i] = sc
+            train_sb[:,train_i] = sb
+            train_mfcc[:,train_i] = mfcc
+            train_chroma[:,train_i] = chroma
+            train_i += 1
+            label = 2 # Calm
+            train_targets.append(label)
+        elif 549 <= ind <= 561+147:
+            train_sc[:,train_i] = sc
+            train_sb[:,train_i] = sb
+            train_mfcc[:,train_i] = mfcc
+            train_chroma[:,train_i] = chroma
+            train_i += 1
+            label = 3 # Hype
+            train_targets.append(label)
+
+    clf_sc = svm.SVC(class_weight='balanced')
+    clf_sb = svm.SVC(class_weight='balanced')
+    clf_mfcc = svm.SVC(class_weight='balanced')
+    clf_chroma = svm.SVC(class_weight='balanced')
+
+    clf_sc.fit(train_sc.T, train_targets)
+    clf_sb.fit(train_sb.T, train_targets)
+    clf_mfcc.fit(train_mfcc.T, train_targets)
+    clf_chroma.fit(train_chroma.T, train_targets)
+
+    sc_preds = clf_sc.predict(sc.reshape(1, -1))
+    sb_preds = clf_sb.predict(sb.reshape(1, -1))
+    mfcc_preds = clf_mfcc.predict(mfcc.reshape(1, -1))
+    chroma_preds = clf_chroma.predict(chroma.reshape(1, -1))
+
+    return stats.mode(np.concatenate((sc_preds, sb_preds, mfcc_preds, chroma_preds)))[0][0]
