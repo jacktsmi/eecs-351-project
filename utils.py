@@ -80,24 +80,12 @@ def load_train(load_path):
     return train_data
 
 def k_nn(path):
-    fs, data1 = wavfile.read(path)
-    if data1.ndim > 1:
-        data1 = data1[:, 0]
-    data = middle_n(data1, 1000000)
-    sc = ft.calc_spectral_centroid(data, fs)
-    sb = ft.calc_spectral_bandwidth(data, fs, sc)
-    mfcc = ft.calc_mfcc(data, fs)
-    data2 = middle_n(data1, 25000)
-    chroma = ft.calc_chroma(data2, fs)
-
-    train_sc = np.zeros((250, 160*4))
-    train_sb = np.zeros((250, 160*4))
-    train_mfcc = np.zeros((5976, 160*4))
-    train_chroma = np.zeros((25*12, 160*4))
+    train_sc = np.zeros((250, 148*4))
+    train_sb = np.zeros((250, 148*4))
+    train_mfcc = np.zeros((5976, 148*4))
+    train_chroma = np.zeros((25*12, 148*4))
 
     train_targets = []
-
-    accuracies = []
 
     train_i = 0
 
@@ -108,7 +96,7 @@ def k_nn(path):
         mfcc = np.load("train_mfcc/" + i + ".npy")
         chroma = np.load("train_chroma/" + i + ".npy")
 
-        if 0 <= ind <= 12+147:
+        if 12 <= ind <= 12+147:
             train_sc[:,train_i] = sc
             train_sb[:,train_i] = sb
             train_mfcc[:,train_i] = mfcc
@@ -116,7 +104,7 @@ def k_nn(path):
             train_i += 1
             label = 0 # Happy
             train_targets.append(label)
-        elif 220 <= ind <= 232+147:
+        elif 232 <= ind <= 232+147:
             train_sc[:,train_i] = sc
             train_sb[:,train_i] = sb
             train_mfcc[:,train_i] = mfcc
@@ -124,7 +112,7 @@ def k_nn(path):
             train_i += 1
             label = 1 # Sad
             train_targets.append(label)
-        elif 380 <= ind <= 392+147:
+        elif 391 <= ind <= 391+147:
             train_sc[:,train_i] = sc
             train_sb[:,train_i] = sb
             train_mfcc[:,train_i] = mfcc
@@ -132,7 +120,7 @@ def k_nn(path):
             train_i += 1
             label = 2 # Calm
             train_targets.append(label)
-        elif 549 <= ind <= 561+147:
+        elif 560 <= ind <= 560+147:
             train_sc[:,train_i] = sc
             train_sb[:,train_i] = sb
             train_mfcc[:,train_i] = mfcc
@@ -140,13 +128,25 @@ def k_nn(path):
             train_i += 1
             label = 3 # Hype
             train_targets.append(label)
+    
+    fs, data1 = wavfile.read(path)
+    if data1.ndim > 1:
+        data1 = data1[:, 0]
+    data = middle_n(data1, 250000)
+    sc = ft.calc_spectral_centroid(data, fs)
+    sb = ft.calc_spectral_bandwidth(data, fs, sc)
+    mfcc = ft.calc_mfcc(data, fs)
+    mfcc = mfcc.reshape(mfcc.shape[0]*mfcc.shape[1])
+    data2 = middle_n(data1, 25000)
+    chroma = ft.calc_chroma(data2, fs)
+    chroma = chroma.reshape(chroma.shape[0]*chroma.shape[1])
 
     k = 40
 
-    sc_diff = train_sc - np.tile(sc, (160*4,1)).T
-    sb_diff = train_sb - np.tile(sb, (160*4,1)).T
-    mfcc_diff = train_mfcc - np.tile(mfcc, (160*4,1)).T
-    chroma_diff = train_chroma - np.tile(chroma, (160*4,1)).T
+    sc_diff = train_sc - np.tile(sc, (148*4,1)).T
+    sb_diff = train_sb - np.tile(sb, (148*4,1)).T
+    mfcc_diff = train_mfcc - np.tile(mfcc, (148*4,1)).T
+    chroma_diff = train_chroma - np.tile(chroma, (148*4,1)).T
 
     sc_norm = np.linalg.norm(sc_diff,axis = 0)
     sb_norm = np.linalg.norm(sb_diff,axis = 0)
@@ -216,6 +216,18 @@ def calc_svm(path):
             train_i += 1
             label = 3 # Hype
             train_targets.append(label)
+    
+    fs, data1 = wavfile.read(path)
+    if data1.ndim > 1:
+        data1 = data1[:, 0]
+    data = middle_n(data1, 250000)
+    sc = ft.calc_spectral_centroid(data, fs)
+    sb = ft.calc_spectral_bandwidth(data, fs, sc)
+    mfcc = ft.calc_mfcc(data, fs)
+    mfcc = mfcc.reshape(mfcc.shape[0]*mfcc.shape[1])
+    data2 = middle_n(data1, 25000)
+    chroma = ft.calc_chroma(data2, fs)
+    chroma = chroma.reshape(chroma.shape[0]*chroma.shape[1])
 
     clf_sc = svm.SVC(class_weight='balanced')
     clf_sb = svm.SVC(class_weight='balanced')
