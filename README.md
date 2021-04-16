@@ -8,7 +8,7 @@ This project has only been tested with the following:
 * Python >3.8.5
 
 # Instructions for Testing
-We used Visual Studio Code for testing. Open featurizer_tests.py and run entire file. If in Visual Studio Code, then right click in the file and select "Run Current File in Interactive Window." This provides plots for the three features we have coded so far, and for one song of each mood.
+We used Visual Studio Code for testing. Open featurizer_tests.py and run entire file. This provides plots for the three features we have coded so far, and for one song of each mood.
 
 To test our different classifier methods:
 1. Open the terminal and type: python3 classifier_tests.py
