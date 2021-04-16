@@ -30,88 +30,48 @@ test_targets = []
 
 for ind in range(1, 730):
     i = str(ind)
-    sc = np.load("train_sc_moresamps/" + i + ".npy")
-    sb = np.load("train_sb_moresamps/" + i + ".npy")
     mfcc = np.load("train_mfcc_moresamps/" + i + ".npy")
-    chroma = np.load("train_chroma_moresamps/" + i + ".npy")
     mfcc = mfcc.reshape((mfcc.shape[0]*mfcc.shape[1]))
-    chroma = chroma.reshape((chroma.shape[0]*chroma.shape[1]))
     if 0 < ind < 12: # or 368 < ind < 380 or 537 < ind < 549 or 718 < ind < 730:
-        sc_test.append(sc)
-        sb_test.append(sb)
         mfcc_test.append(mfcc)
-        chroma_test.append(chroma)
         label = 0 # Happy
         test_targets.append(label)
     elif 220 < ind < 232:
-        sc_test.append(sc)
-        sb_test.append(sb)
         mfcc_test.append(mfcc)
-        chroma_test.append(chroma)
         label = 1 # Sad
         test_targets.append(label)
     elif 379 < ind < 391:
-        sc_test.append(sc)
-        sb_test.append(sb)
         mfcc_test.append(mfcc)
-        chroma_test.append(chroma)
         label = 2 # Calm
         test_targets.append(label)
     elif 548 < ind < 560:
-        sc_test.append(sc)
-        sb_test.append(sb)
         mfcc_test.append(mfcc)
-        chroma_test.append(chroma)
         label = 3 # Hype
         test_targets.append(label)
     elif 12 <= ind <= 159:
-        sc_train.append(sc)
-        sb_train.append(sb)
         mfcc_train.append(mfcc)
-        chroma_train.append(chroma)
         label = 0 # Happy
         train_targets.append(label)
     elif 232 <= ind <= 379:
-        sc_train.append(sc)
-        sb_train.append(sb)
         mfcc_train.append(mfcc)
-        chroma_train.append(chroma)
         label = 1 # Sad
         train_targets.append(label)
     elif 391 <= ind <= 391+147:
-        sc_train.append(sc)
-        sb_train.append(sb)
         mfcc_train.append(mfcc)
-        chroma_train.append(chroma)
         label = 2 # Calm
         train_targets.append(label)
     elif 560 <= ind <= 560+147:
-        sc_train.append(sc)
-        sb_train.append(sb)
         mfcc_train.append(mfcc)
-        chroma_train.append(chroma)
         label = 3 # Hype
         train_targets.append(label)
 
-sc_net = MyNet(input_dim = sc_train[0].shape[0])
-sb_net = MyNet(input_dim = sb_train[0].shape[0])
 mfcc_net = MyNet(input_dim = mfcc_train[0].shape[0])
-chroma_net = MyNet(input_dim = chroma_train[0].shape[0])
 
-sc_net.apply(weights_init)
-sb_net.apply(weights_init)
 mfcc_net.apply(weights_init)
-chroma_net.apply(weights_init)
 
-# sc_data = MyDataset(sc_train, train_targets)
-# sb_data = MyDataset(sb_train, train_targets)
 mfcc_data = MyDataset(mfcc_train, train_targets)
-#chroma_data = MyDataset(chroma_train, train_targets)
 
-#sc_test = MyDataset(sc_test, test_targets)
-#sb_test = MyDataset(sb_test, test_targets)
 mfcc_test = MyDataset(mfcc_test, test_targets)
-#chroma_test = MyDataset(chroma_test, test_targets)
 
 batch_size = 40
 
@@ -133,10 +93,7 @@ test_loader = DataLoader(
     shuffle=True
 )
 
-#optim_sc = optim.Adam(sc_net.parameters(), lr=learning_rate, betas=(0.5, 0.999))
-#optim_sb = optim.Adam(sb_net.parameters(), lr=learning_rate, betas=(0.5, 0.999))
 optim_mfcc = optim.Adam(mfcc_net.parameters(), lr=learning_rate, betas=(0.5, 0.999))
-#optim_chroma = optim.Adam(chroma_net.parameters(), lr=learning_rate, betas=(0.5, 0.999))
 
 loss_traj_sc = []
 loss_traj_sb = []
@@ -159,10 +116,7 @@ criterion = nn.CrossEntropyLoss()
 for epoch in range(num_epochs):
     print("Epoch #" + str(epoch+1) + "/" + str(num_epochs))
     
-    #sc_net.train()
-    #sb_net.train()
     mfcc_net.train()
-    #chroma_net.train()
 
     running_mfcc_loss = 0.0
     running_mfcc_loss_test = 0.0
@@ -223,8 +177,6 @@ for epoch in range(num_epochs):
     # Total loss from all NN's
 
     # Calculating average accuracy over the 4 NN's
-    #train_epoch_acc = (running_chroma_corrects.double()+running_mfcc_corrects.double()+running_sb_corrects.double()+running_sc_corrects.double()) / num_samples_train / 4
-    #test_epoch_acc = (running_chroma_corrects_test+running_mfcc_corrects_test+running_sb_corrects_test+running_sc_corrects_test) / num_samples_test / 4
     train_epoch_acc = (running_mfcc_corrects.double()) / num_samples_train
     test_epoch_acc = (running_mfcc_corrects_test) / num_samples_test
 
@@ -242,7 +194,6 @@ for epoch in range(num_epochs):
 
     print('{} Acc: {:.4f}'.format('train', train_epoch_acc))
     print('{} Acc: {:.4f}'.format('test', test_epoch_acc))
-    #print("SC:" + str(sc_test_acc.item()) + " SB:" + str(sb_test_acc.item()) + " MFCC:" + str(mfcc_test_acc.item()) + " Chroma:" + str(chroma_test_acc.item()))
 
 loss_traj_mfcc.append(running_mfcc_loss_test)
 
