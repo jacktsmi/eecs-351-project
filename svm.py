@@ -94,10 +94,10 @@ for ind in range(1, 730):
         label = 3 # Hype
         train_targets.append(label)
 
-clf_sc = svm.SVC(class_weight='balanced')
-clf_sb = svm.SVC(class_weight='balanced')
-clf_mfcc = svm.SVC(class_weight='balanced')
-clf_chroma = svm.SVC(class_weight='balanced')
+clf_sc = svm.SVC(C=1, class_weight='balanced')
+clf_sb = svm.SVC(C=1, class_weight='balanced')
+clf_mfcc = svm.SVC(C=1, class_weight='balanced')
+clf_chroma = svm.SVC(C=1, class_weight='balanced')
 
 clf_sc.fit(train_sc.T, train_targets)
 clf_sb.fit(train_sb.T, train_targets)
