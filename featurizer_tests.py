@@ -8,22 +8,22 @@ import librosa.display
 
 # Plots to see if spectral centroid appears to be the weighted average frequency.
 # To run, select and right-click and select "Run Selection/Line in Interactive Window"
-fs1, data1 = wavfile.read('./train/train100.wav') # Happy Song
+fs1, data1 = wavfile.read('./test_songs/test_Happy.wav') # Happy Song
 data1 = data1[:, 0] # Take only one channel
 data1 = np.array(data1)
 data1 = ut.middle_n(data1, 250000)
 
-fs2, data2 = wavfile.read('./train/train300.wav') # Sad Song
+fs2, data2 = wavfile.read('./test_songs/test_Angel.wav') # Sad Song
 data2 = data2[:, 0] # Take only one channel
 data2 = np.array(data2)
 data2 = ut.middle_n(data2, 250000)
 
-fs3, data3 = wavfile.read('./train/train498.wav') # Calm Song
+fs3, data3 = wavfile.read('./test_songs/plots_calm.wav') # Calm Song
 data3 = data3[:, 0] # Take only one channel
 data3 = np.array(data3)
 data3 = ut.middle_n(data3, 250000)
 
-fs4, data4 = wavfile.read('./train/train700.wav') # Hype Song
+fs4, data4 = wavfile.read('./test_songs/plots_hype.wav') # Hype Song
 data4 = data4[:, 0] # Take only one channel
 data4 = np.array(data4)
 data4 = ut.middle_n(data4, 250000)
