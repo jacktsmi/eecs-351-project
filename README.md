@@ -7,6 +7,14 @@ This project has only been tested with the following:
 * Torch Version 1.8.1
 * Python >3.8.5
 
+# Dataset
+We gathered the dataset ourselves (total dataset not here because it is too large) by using a Python library called Savify. This allowed us to download playlists categorized by each mood from Spotify. The playlists we used are given below:
+
+**Happy:** https://open.spotify.com/playlist/4AnAUkQNrLKlJCInZGSXRO  
+**Sad:** https://open.spotify.com/playlist/78FHjijA1gBLuVx4qmcHq6  
+**Calm:** https://open.spotify.com/playlist/6EIVswdPfoE9Wac7tB6FNg and https://open.spotify.com/playlist/37i9dQZF1DX5bjCEbRU4SJ  
+**Hype/Energetic:** https://open.spotify.com/playlist/37i9dQZF1DX4eRPd9frC1m  
+
 # Instructions for Testing
 Open featurizer_tests.py and run entire file. This provides plots for the three features we have coded so far, and for one song of each mood.
 
