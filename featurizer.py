@@ -188,7 +188,7 @@ def calc_chroma(song, fs, frame_size=1000):
     lower = np.zeros(128)
     upper = np.zeros(128)
     # Finds upper and lower bounds for each MIDI pitch
-    for p in range(0, 127):
+    for p in range(24, 127):
         lower[p] = 2 ** ((p - 0.5 - 69) / 12) * 440
         upper[p] = 2 ** ((p + 0.5 - 69) / 12) * 440
 
@@ -197,7 +197,7 @@ def calc_chroma(song, fs, frame_size=1000):
     mag_pitch = np.zeros((num_frames, 128))
     for i in range(0, num_frames):
         for j in range(0, frame_size):
-            for p in range(0, 127):
+            for p in range(24, 127):
                 if lower[p] <= C_freq[i][j] < upper[p]:
                     mag_pitch[i][p] += C[i][j]
                     break
@@ -205,7 +205,7 @@ def calc_chroma(song, fs, frame_size=1000):
     # Matches the chroma labels to the MIDI pitches
     mag_chroma = np.zeros((num_frames, 12))
     for i in range(0, num_frames):
-        for p in range(0, 127):
+        for p in range(24, 127):
             mag_chroma[i][(p - 60) % 12] += mag_pitch[i][p]
         for p in range(0, 12):
             mag_chroma[i][p] = 10*np.log10(mag_chroma[i][p])
