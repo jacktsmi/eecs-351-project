@@ -15,6 +15,8 @@ We gathered the dataset ourselves (total dataset not here because it is too larg
 **Calm:** https://open.spotify.com/playlist/6EIVswdPfoE9Wac7tB6FNg and https://open.spotify.com/playlist/37i9dQZF1DX5bjCEbRU4SJ  
 **Hype/Energetic:** https://open.spotify.com/playlist/37i9dQZF1DX4eRPd9frC1m  
 
+We then featurized all of the songs and stored them as loadable numpy arrays in the respective folders, ie. "train_spectral_centroid". The folders that have "moresamps" at the end of the name have a higher number of samples featurized for each song.
+
 # Instructions for Testing
 Open featurizer_tests.py and run entire file. This provides plots for the three features we have coded so far, and for one song of each mood.
 
